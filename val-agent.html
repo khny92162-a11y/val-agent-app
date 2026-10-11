@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#080b12">
+<title>סוכן Val · בונה פרויקטים</title>
+<style>
+:root{--bg:#080b12;--bg2:#0e1320;--card:rgba(20,26,40,.7);--card2:rgba(30,38,58,.75);--fg:#f1f4fb;--mut:#97a3bf;--line:rgba(255,255,255,.09);--acc:#e6bd45;--acc2:#f7dc7e;--ok:#49dc9a;--err:#ff7070;--sab:env(safe-area-inset-bottom,0px);--sat:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:radial-gradient(60% 40% at 50% -5%,rgba(230,189,69,.12),transparent 70%),var(--bg);color:var(--fg);font-family:Assistant,"Noto Sans Hebrew","Segoe UI",system-ui,sans-serif;overflow:hidden}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;transition:transform .15s,background .2s,border-color .2s}
+button:active{transform:scale(.96)}
+[hidden]{display:none!important}
+#app{height:100dvh;display:grid;grid-template-rows:auto 1fr auto;max-width:960px;margin:0 auto;padding:calc(10px + var(--sat)) 12px calc(12px + var(--sab));gap:10px}
+header{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.brand{flex:1;min-width:140px;display:flex;align-items:center;gap:10px}
+.logo{width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,var(--acc2),var(--acc));display:grid;place-items:center;color:#1a1405;font-weight:900}
+.brand b{font-size:16px}.brand small{display:block;color:var(--mut);font-size:12px}
+.sel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:13px;max-width:240px}
+.sel option{background:#131a2a}
+.pill{padding:6px 12px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-size:12.5px;color:var(--mut)}
+.pill.ok{color:var(--ok)}.pill.err{color:var(--err)}
+.ibtn{padding:8px 12px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:13px}
+.ibtn:hover{border-color:rgba(230,189,69,.45)}
+#chat{overflow:auto;display:flex;flex-direction:column;gap:12px;padding:6px 2px;min-height:0}
+.m{max-width:820px;width:100%;margin:0 auto;display:flex;gap:10px}
+.av{width:30px;height:30px;border-radius:10px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:800;background:var(--card2)}
+.m.ai .av{background:linear-gradient(135deg,var(--acc2),var(--acc));color:#1a1405}
+.bub{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px;line-height:1.7;white-space:pre-wrap;word-break:break-word;font-size:15px}
+.m.user .bub{background:rgba(230,189,69,.1);border-color:rgba(230,189,69,.25)}
+.tool{max-width:820px;width:100%;margin:0 auto;font-size:12.5px;color:var(--mut);background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:8px 12px}
+.tool b{color:var(--acc2)}
+.tool code{direction:ltr;display:block;white-space:pre-wrap;word-break:break-all;margin-top:4px;opacity:.85;max-height:90px;overflow:hidden}
+.dl{display:inline-block;margin-top:8px;padding:8px 14px;border-radius:12px;background:linear-gradient(135deg,var(--acc2),var(--acc));color:#1a1405;font-weight:800;text-decoration:none}
+.empty{margin:auto;text-align:center;color:var(--mut);max-width:520px;padding:20px;line-height:1.8}
+.empty h2{color:var(--fg);margin:6px 0}
+.sugs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+.sug{padding:9px 14px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-size:13.5px}
+#composer{max-width:820px;width:100%;margin:0 auto;display:flex;gap:8px;align-items:flex-end;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:8px}
+#composer:focus-within{border-color:rgba(230,189,69,.55)}
+#inp{flex:1;background:none;border:0;outline:none;resize:none;padding:8px;min-height:24px;max-height:180px;font-size:15px;line-height:1.5}
+#send{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--acc2),var(--acc));color:#1a1405;font-weight:900;font-size:18px}
+#send.stop{background:var(--err);color:#fff}
+#sheet{position:fixed;inset:0;background:rgba(3,5,10,.6);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;z-index:30}
+#sheet.open{display:flex}
+#sheet .box{width:min(620px,100%);background:#121829;border:1px solid var(--line);border-radius:24px 24px 0 0;padding:18px 18px calc(18px + var(--sab));max-height:88dvh;overflow:auto}
+.fld{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.fld label{font-size:13px;color:var(--mut)}
+.fld input{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;direction:ltr;text-align:left}
+.fld small{color:var(--mut);font-size:12px;line-height:1.5}
+.btn{padding:10px 16px;border-radius:14px;background:var(--card2);border:1px solid var(--line)}
+.btn.primary{background:linear-gradient(135deg,var(--acc2),var(--acc));color:#1a1405;font-weight:800;border:0}
+#toast{position:fixed;top:calc(12px + var(--sat));left:50%;transform:translateX(-50%);max-width:92vw;background:var(--card2);border:1px solid var(--line);padding:10px 16px;border-radius:14px;font-size:14px;z-index:40;display:none}
+#toast.err{border-color:rgba(255,112,112,.6)}#toast.ok{border-color:rgba(73,220,154,.5)}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand"><div class="logo">◆</div><div><b>סוכן Val</b><small>בונה ומשדרג פרויקטים</small></div></div>
+    <select id="model" class="sel" aria-label="מודל"></select>
+    <span class="pill" id="pVal">Val: לא מחובר</span>
+    <button class="ibtn" id="bSet">הגדרות</button>
+    <button class="ibtn" id="bNew">שיחה חדשה</button>
+  </header>
+
+  <main id="chat"></main>
+
+  <form id="composer" onsubmit="return false">
+    <textarea id="inp" rows="1" placeholder="למשל: צור לי פרויקט Val בשם todo עם דף HTML פשוט"></textarea>
+    <button id="send" aria-label="שלח">➤</button>
+  </form>
+</div>
+
+<div id="sheet">
+  <div class="box">
+    <b style="font-size:17px">הגדרות</b>
+    <div class="fld"><label>מפתח NVIDIA (חובה לשיחה)</label><input id="kNv" type="password" autocomplete="off" spellcheck="false"><small>מודלים דרך integrate.api.nvidia.com</small></div>
+    <div class="fld"><label>טוקן Val Town (חובה לפרויקטים)</label><input id="kVal" type="password" autocomplete="off" spellcheck="false"><small>נוצר ב-val.town/settings/api. נשמר רק במכשיר הזה.</small></div>
+    <div class="fld"><label>מפתח Tavily (לחיפוש ברשת, לא חובה)</label><input id="kTav" type="password" autocomplete="off" spellcheck="false"></div>
+    <div class="fld"><label>כתובת MCP של Val</label><input id="mcpUrl" autocomplete="off" spellcheck="false"><small>ברירת מחדל: https://api.val.town/v3/mcp</small></div>
+    <div style="display:flex;gap:8px;justify-content:space-between;margin-top:14px;flex-wrap:wrap">
+      <button class="btn" id="bTest">בדוק חיבורים</button>
+      <div style="display:flex;gap:8px"><button class="btn" id="bClose">ביטול</button><button class="btn primary" id="bSave">שמור</button></div>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+/* ======================================================================
+   סוכן Val · קובץ אחד. המפתחות נשמרים רק בדפדפן הזה (localStorage).
+   לא מעלים את הקובץ לאתר ציבורי כשהמפתחות מוזנים בו.
+   ====================================================================== */
+const DEFAULT_MCP = "https://api.val.town/v3/mcp";
+const MODELS = [
+  ["nvidia/nemotron-3-ultra-550b-a55b", "Nemotron Ultra (550B)"],
+  ["z-ai/glm-5.3", "GLM 5.3 (753B)"],
+  ["moonshotai/kimi-k3", "Kimi K3 (2.8T, איטי)"],
+  ["nvidia/nemotron-3-super-120b-a12b", "Nemotron Super (120B)"],
+];
+const $ = (id) => document.getElementById(id);
+/* ============ מפתחות קבועים: הדבק את המפתחות שלך בין הגרשיים ============
+   הם נשארים בתוך הקובץ, בלי צורך להזין שוב. אל תשתף את הקובץ עם מפתחות מולאו. */
+const EMBED = {
+  nv:  "",   // מפתח NVIDIA (חובה לשיחה)
+  val: "",   // טוקן Val Town (חובה לפרויקטים)
+  tav: "",   // מפתח Tavily (לחיפוש ברשת, לא חובה)
+};
+/* ======================================================================== */
+const cfg = {
+  nv: EMBED.nv || localStorage.getItem("ag_nv") || "",
+  val: EMBED.val || localStorage.getItem("ag_val") || "",
+  tav: EMBED.tav || localStorage.getItem("ag_tav") || "",
+  mcp: localStorage.getItem("ag_mcp") || DEFAULT_MCP,
+  model: localStorage.getItem("ag_model") || MODELS[0][0],
+};
+let history = [];          // שיחה בזיכרון בלבד (לא נשמר)
+let busy = false, abortCtl = null, mcpSession = null, mcpId = 0;
+
+function toast(msg, kind = "") { const t = $("toast"); t.textContent = msg; t.className = kind; t.style.display = "block"; clearTimeout(t._h); t._h = setTimeout(() => (t.style.display = "none"), 4200); }
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+// ---------- שכבת MCP (Streamable HTTP) ----------
+function parseMcp(text, ct) {
+  if (ct && ct.includes("text/event-stream")) {
+    let last = null;
+    for (const line of text.split("\n")) if (line.startsWith("data:")) { try { last = JSON.parse(line.slice(5)); } catch {} }
+    return last;
+  }
+  try { return JSON.parse(text); } catch { return null; }
+}
+async function mcpPost(body, withSession = true) {
+  const headers = { "Content-Type": "application/json", Accept: "application/json, text/event-stream", Authorization: "Bearer " + cfg.val };
+  if (withSession && mcpSession) headers["Mcp-Session-Id"] = mcpSession;
+  const r = await fetch(cfg.mcp, { method: "POST", headers, body: JSON.stringify(body) });
+  const sid = r.headers.get("Mcp-Session-Id"); if (sid) mcpSession = sid;
+  if (!r.ok) throw new Error("MCP HTTP " + r.status + ": " + (await r.text()).slice(0, 160));
+  if (r.status === 202) return null;
+  return parseMcp(await r.text(), r.headers.get("content-type"));
+}
+async function mcpInit() {
+  if (mcpSession) return;
+  if (!cfg.val) throw new Error("חסר טוקן Val Town בהגדרות");
+  const res = await mcpPost({ jsonrpc: "2.0", id: ++mcpId, method: "initialize", params: { protocolVersion: "2025-03-26", capabilities: {}, clientInfo: { name: "val-agent", version: "1.0" } } }, false);
+  if (res?.error) throw new Error("MCP: " + res.error.message);
+  await mcpPost({ jsonrpc: "2.0", method: "notifications/initialized" });
+}
+async function mcpCall(name, args) {
+  await mcpInit();
+  const res = await mcpPost({ jsonrpc: "2.0", id: ++mcpId, method: "tools/call", params: { name, arguments: args } });
+  if (!res) throw new Error("אין תשובה מ-MCP");
+  if (res.error) throw new Error(res.error.message || "שגיאת MCP");
+  const txt = (res.result?.content || []).map((c) => c.text || "").join("\n");
+  if (res.result?.isError) throw new Error(txt.slice(0, 400));
+  return txt.slice(0, 12000);
+}
+
+// ---------- כלים לסוכן ----------
+const TOOLS = [
+  { type: "function", function: { name: "list_vals", description: "רשימת פרויקטי Val Town של המשתמש", parameters: { type: "object", properties: {} } } },
+  { type: "function", function: { name: "list_files", description: "רשימת קבצים בפרויקט Val", parameters: { type: "object", properties: { val: { type: "string", description: "שם הפרויקט, בצורת user/name" } }, required: ["val"] } } },
+  { type: "function", function: { name: "read_file", description: "קריאת קובץ מפרויקט Val", parameters: { type: "object", properties: { val: { type: "string" }, path: { type: "string" } }, required: ["val", "path"] } } },
+  { type: "function", function: { name: "write_file", description: "כתיבת קובץ בפרויקט Val (יוצר או מעדכן). השתמש רק כשהמשתמש ביקש.", parameters: { type: "object", properties: { val: { type: "string" }, path: { type: "string" }, content: { type: "string" } }, required: ["val", "path", "content"] } } },
+  { type: "function", function: { name: "create_val", description: "יצירת פרויקט Val חדש", parameters: { type: "object", properties: { name: { type: "string" }, privacy: { type: "string", enum: ["public", "unlisted", "private"] } }, required: ["name"] } } },
+  { type: "function", function: { name: "run_file", description: "הרצת קובץ בפרויקט Val והחזרת הפלט", parameters: { type: "object", properties: { val: { type: "string" }, path: { type: "string" } }, required: ["val", "path"] } } },
+  { type: "function", function: { name: "web_search", description: "חיפוש ברשת למידע עדכני", parameters: { type: "object", properties: { query: { type: "string" } }, required: ["query"] } } },
+  { type: "function", function: { name: "make_html", description: "יצירת קובץ HTML עצמאי שהמשתמש יוכל להוריד. התוכן חייב להיות דף HTML מלא.", parameters: { type: "object", properties: { filename: { type: "string" }, content: { type: "string" } }, required: ["filename", "content"] } } },
+];
+async function runTool(name, args) {
+  switch (name) {
+    case "list_vals": return await mcpCall("list_vals", {});
+    case "list_files": return await mcpCall("list_files", { val: args.val });
+    case "read_file": return await mcpCall("read_file", { val: args.val, path: args.path });
+    case "write_file": {
+      try { return await mcpCall("update_file", { val: args.val, path: args.path, content: args.content }); }
+      catch { return await mcpCall("create_file", { val: args.val, path: args.path, content: args.content }); }
+    }
+    case "create_val": return await mcpCall("create_val", { name: args.name, privacy: args.privacy || "private" });
+    case "run_file": return await mcpCall("run_file", { val: args.val, path: args.path });
+    case "web_search": {
+      if (!cfg.tav) return "חיפוש לא זמין: חסר מפתח Tavily בהגדרות";
+      const r = await fetch("https://api.tavily.com/search", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ api_key: cfg.tav, query: args.query, max_results: 6, include_answer: true }) });
+      const d = await r.json();
+      return ((d.results || []).map((x) => x.title + ": " + (x.content || "").slice(0, 300) + " (" + x.url + ")").join("\n") || "אין תוצאות");
+    }
+    case "make_html": {
+      const fn = (args.filename || "page.html").replace(/[^\w.\-א-ת]/g, "_");
+      const blob = new Blob([args.content], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      return JSON.stringify({ __download: true, url, filename: fn.endsWith(".html") ? fn : fn + ".html" });
+    }
+    default: return "כלי לא מוכר: " + name;
+  }
+}
+
+// ---------- שיחה עם NVIDIA ----------
+const SYSTEM = `אתה סוכן מומחה שבונה ומשדרג פרויקטים ב-Val Town, ומכין קבצי HTML עצמאיים. ענה בעברית, בקצרה וברור.
+- כשמבקשים פרויקט חדש: צור אותו (create_val) ואז כתוב את הקבצים (write_file), והרץ לבדיקה (run_file) כשאפשר.
+- כשמבקשים שדרוג לפרויקט קיים: קודם קרא את הקובץ (read_file), שנה רק מה שנדרש, ודווח מה השתנה.
+- קובץ HTML עצמאי: השתמש ב-make_html.
+- אל תמחק דבר ואל תכתוב מעל קובץ בלי שהמשתמש ביקש במפורש.
+- אם חסר מפתח או הרשאה, אמור מה חסר במקום לנחש.`;
+
+async function nvChat(messages) {
+  if (!cfg.nv) throw new Error("חסר מפתח NVIDIA בהגדרות");
+  abortCtl = new AbortController();
+  const r = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+    method: "POST", signal: abortCtl.signal,
+    headers: { "Content-Type": "application/json", Authorization: "Bearer " + cfg.nv },
+    body: JSON.stringify({ model: cfg.model, messages, tools: TOOLS, tool_choice: "auto", temperature: 0.3, max_tokens: 4000 }),
+  });
+  const d = await r.json().catch(() => null);
+  if (!r.ok) throw new Error("NVIDIA " + r.status + ": " + String(d?.detail || d?.error?.message || d?.error || "שגיאה").slice(0, 200));
+  return d.choices[0].message;
+}
+
+// ---------- תצוגה ----------
+function addMsg(role, text) {
+  const wrap = $("chat"); const e = wrap.querySelector(".empty"); if (e) e.remove();
+  const d = document.createElement("div"); d.className = "m " + role;
+  d.innerHTML = `<div class="av">${role === "user" ? "אני" : "◆"}</div><div class="bub">${esc(text)}</div>`;
+  wrap.appendChild(d); wrap.scrollTop = wrap.scrollHeight; return d.querySelector(".bub");
+}
+function addTool(name, args, result, ok) {
+  const d = document.createElement("div"); d.className = "tool";
+  let link = "";
+  try { const j = JSON.parse(result); if (j.__download) link = `<a class="dl" href="${j.url}" download="${esc(j.filename)}">⬇ הורד ${esc(j.filename)}</a>`; } catch {}
+  d.innerHTML = `<b>${ok ? "✓" : "✗"} ${esc(name)}</b> ${esc(JSON.stringify(args).slice(0, 140))}<code>${esc(String(result).slice(0, 400))}</code>${link}`;
+  $("chat").appendChild(d); $("chat").scrollTop = $("chat").scrollHeight;
+}
+function setBusy(b) { busy = b; $("send").textContent = b ? "■" : "➤"; $("send").className = b ? "stop" : ""; }
+
+// ---------- לולאת הסוכן ----------
+async function send(text) {
+  if (busy) { if (abortCtl) abortCtl.abort(); return; }
+  if (!text.trim()) return;
+  addMsg("user", text);
+  history.push({ role: "user", content: text });
+  setBusy(true);
+  try {
+    for (let round = 0; round < 8; round++) {
+      const msg = await nvChat([{ role: "system", content: SYSTEM }, ...history]);
+      history.push(msg);
+      if (!msg.tool_calls || !msg.tool_calls.length) { if (msg.content) addMsg("ai", msg.content); break; }
+      for (const tc of msg.tool_calls) {
+        let args = {}; try { args = JSON.parse(tc.function.arguments || "{}"); } catch {}
+        let result, ok = true;
+        try { result = await runTool(tc.function.name, args); } catch (e) { result = "שגיאה: " + e.message; ok = false; }
+        addTool(tc.function.name, args, result, ok);
+        history.push({ role: "tool", tool_call_id: tc.id, content: String(result).slice(0, 8000) });
+      }
+    }
+  } catch (e) {
+    if (e.name === "AbortError") addMsg("ai", "הפעולה הופסקה.");
+    else { addMsg("ai", "שגיאה: " + e.message); toast(e.message, "err"); }
+  } finally { setBusy(false); abortCtl = null; }
+}
+
+// ---------- הגדרות וחיבורים ----------
+function fillModels() {
+  $("model").innerHTML = MODELS.map(([v, l]) => `<option value="${v}">${esc(l)}</option>`).join("");
+  $("model").value = cfg.model;
+}
+function openSettings() {
+  $("kNv").value = cfg.nv; $("kVal").value = cfg.val; $("kTav").value = cfg.tav; $("mcpUrl").value = cfg.mcp;
+  $("sheet").classList.add("open");
+}
+$("bSet").onclick = openSettings;
+$("bClose").onclick = () => $("sheet").classList.remove("open");
+$("sheet").onclick = (e) => { if (e.target === $("sheet")) $("sheet").classList.remove("open"); };
+$("bSave").onclick = () => {
+  cfg.nv = EMBED.nv || $("kNv").value.trim(); cfg.val = EMBED.val || $("kVal").value.trim(); cfg.tav = EMBED.tav || $("kTav").value.trim(); cfg.mcp = $("mcpUrl").value.trim() || DEFAULT_MCP;
+  localStorage.setItem("ag_nv", cfg.nv); localStorage.setItem("ag_val", cfg.val); localStorage.setItem("ag_tav", cfg.tav); localStorage.setItem("ag_mcp", cfg.mcp);
+  mcpSession = null;
+  $("sheet").classList.remove("open"); toast("נשמר במכשיר", "ok"); setValPill();
+};
+$("bTest").onclick = async () => {
+  const out = [];
+  try { if (!cfg.nv) throw new Error("חסר"); const r = await fetch("https://integrate.api.nvidia.com/v1/models", { headers: { Authorization: "Bearer " + cfg.nv } }); out.push("NVIDIA: " + (r.ok ? "✓" : "✗ " + r.status)); } catch (e) { out.push("NVIDIA: ✗ " + e.message); }
+  try { mcpSession = null; await mcpInit(); const t = await mcpCall("list_vals", {}); out.push("Val: ✓ (" + t.length + " תווים)"); } catch (e) { out.push("Val: ✗ " + e.message); }
+  if (cfg.tav) out.push("Tavily: מוגדר");
+  toast(out.join(" · "), out.every((x) => x.includes("✓") || x.includes("מוגדר")) ? "ok" : "err");
+  setValPill();
+};
+function setValPill() { const p = $("pVal"); p.textContent = "Val: " + (cfg.val ? "מוגדר" : "לא מחובר"); p.className = "pill " + (cfg.val ? "ok" : ""); }
+
+// ---------- קלט ----------
+$("send").onclick = () => { const t = $("inp").value; if (busy || t.trim()) { if (!busy) $("inp").value = ""; send(t); } };
+$("inp").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); $("send").click(); } });
+$("model").onchange = (e) => { cfg.model = e.target.value; localStorage.setItem("ag_model", cfg.model); };
+$("bNew").onclick = () => { history = []; $("chat").innerHTML = ""; mcpSession = null; showEmpty(); };
+function showEmpty() {
+  $("chat").innerHTML = `<div class="empty"><h2>מה נבנה היום?</h2>אני יכול ליצור פרויקטים ב-Val Town, לשדרג קיימים, לכתוב דפי HTML עצמאיים לשיתוף, ולחפש מידע ברשת.<div class="sugs">
+  <button class="sug" data-q="הצג לי את הפרויקטים שלי ב-Val Town">הפרויקטים שלי</button>
+  <button class="sug" data-q="צור לי דף HTML עצמאי של מחשבון BMI בעברית">דף HTML למחשבון</button>
+  <button class="sug" data-q="חפש מה חדש בחדשות היום בישראל ותן סיכום">חדשות היום</button></div></div>`;
+  $("chat").querySelectorAll(".sug").forEach((b) => (b.onclick = () => send(b.dataset.q)));
+}
+fillModels(); setValPill(); showEmpty();
+if (!cfg.nv || !cfg.val) setTimeout(openSettings, 300);
+</script>
+</body>
+</html>
